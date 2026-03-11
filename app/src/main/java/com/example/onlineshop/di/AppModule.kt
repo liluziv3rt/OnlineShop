@@ -13,27 +13,31 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
+object NetworkModule {
+
+    @Provides
+    @Singleton
+    fun provideApiService(appSession: AppSession): ApiService {
+        return ApiFactory.create(appSession)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        apiService: ApiService,
+        appSession: AppSession
+    ): AuthRepository {
+        return AuthRepositoryImpl(apiService, appSession)
+    }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
 object AppModule {
 
     @Provides
     @Singleton
     fun provideAppSession(): AppSession {
         return AppSession()
-    }
-
-    @Provides
-    @Singleton
-    fun provideApiService(appSession: AppSession): ApiService {
-
-        return ApiFactory.create(appSession)
-
-    }
-
-    @Provides
-    @Singleton
-    fun provideAuthRepository(apiService: ApiService): AuthRepository {
-
-        return AuthRepositoryImpl(apiService)
-
     }
 }

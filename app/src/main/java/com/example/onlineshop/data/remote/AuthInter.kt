@@ -17,7 +17,7 @@ class AuthInter(
 
         val newRequest = request
             .newBuilder()
-            .addHeader("Authorization", "Bearer ${appSession.currentLogin?.token}")
+            .addHeader("Authorization", "Bearer ${appSession.currentLogin?.accessToken}")
             .build()
 
         return chain.proceed(newRequest)

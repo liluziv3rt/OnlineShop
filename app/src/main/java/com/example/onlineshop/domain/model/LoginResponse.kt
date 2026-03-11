@@ -1,5 +1,8 @@
 package com.example.onlineshop.domain.model
 
 data class LoginResponse(
-    val token: String
+    val accessToken: String,
+    val refreshToken: String,
+    val user: User
 )
+
