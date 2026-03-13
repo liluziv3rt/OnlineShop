@@ -1,8 +1,11 @@
 package com.example.onlineshop.data.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class RegisterRequestDto(
     val email: String,
     val password: String,
-    val options: RegisterOptionsDto = RegisterOptionsDto()
+    @SerializedName("data")
+    val userData: UserMetadataDto
 )
 

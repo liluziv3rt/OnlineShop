@@ -1,6 +1,7 @@
 // data/repository/AuthRepositoryImpl.kt
 package com.example.onlineshop.data.repository
 
+import android.util.Log
 import com.example.onlineshop.data.dto.LoginRequestDto
 import com.example.onlineshop.data.dto.LoginResponseDto
 import com.example.onlineshop.data.dto.RegisterOptionsDto
@@ -37,36 +38,43 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun registerAsync(registerRequest: RegisterRequest): LoginResponse {
+    // data/repository/AuthRepositoryImpl.kt
+    override suspend fun registerAsync(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String
+    ): LoginResponse {
         val requestDto = RegisterRequestDto(
-            email = registerRequest.email,
-            password = registerRequest.password,
-            options = RegisterOptionsDto(
-                data = UserMetadataDto(
-                    firstname = registerRequest.firstName,
-                    lastname = registerRequest.lastName
-                )
+            email = email,
+            password = password,
+            userData = UserMetadataDto(
+                firstname = firstName,
+                lastname = lastName
             )
         )
 
+        Log.d("AuthRepository", "Sending registration data: $requestDto")
+
         return try {
             val response = apiService.registerAsync(requestDto)
+            Log.d("AuthRepository", "Registration response: $response")
 
             LoginResponse(
-                accessToken = "",
-                refreshToken = "",
+                accessToken = response.access_token,
+                refreshToken = response.refresh_token,
                 user = User(
                     id = response.user.id,
                     email = response.user.email,
-                    firstName = registerRequest.firstName,
-                    lastName = registerRequest.lastName
+                    firstName = firstName,
+                    lastName = lastName
                 )
             )
         } catch (e: Exception) {
+            Log.e("AuthRepository", "Registration failed", e)
             throw Exception("Registration failed: ${e.message}")
         }
     }
-
     override suspend fun getProfileAsync(userId: String): User? {
         return try {
             val token = appSession.currentLogin?.accessToken ?: return null

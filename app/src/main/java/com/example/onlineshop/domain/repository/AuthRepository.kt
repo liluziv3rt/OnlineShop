@@ -7,7 +7,7 @@ import com.example.onlineshop.domain.model.User
 
 interface AuthRepository {
     suspend fun loginAsync(loginRequest: LoginRequest): LoginResponse
-    suspend fun registerAsync(registerRequest: RegisterRequest): LoginResponse
+    suspend fun registerAsync(email: String, password: String, firstName: String, lastName: String): LoginResponse
     suspend fun getProfileAsync(userId: String): User?
     suspend fun logoutAsync(): Result<Unit>
 }

@@ -1,6 +1,6 @@
-// presentation/screens/SignUpScreen.kt
 package com.example.onlineshop.presentation.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -24,18 +24,28 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     val resultState by viewModel.resultState.collectAsState()
-    val registerRequest by viewModel.registerRequest.collectAsState()
-    val confirmPassword by viewModel.confirmPassword.collectAsState()
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val fullName by viewModel.fullName.collectAsState()
+    val consentGiven by viewModel.consentGiven.collectAsState()
 
     var showPassword by remember { mutableStateOf(false) }
-    var showConfirmPassword by remember { mutableStateOf(false) }
 
-    // Обработка успешной регистрации - переход на экран входа
+    // Проверка, все ли поля заполнены и галочка нажата
+    val isFormValid = remember(email, password, fullName, consentGiven) {
+        email.isNotBlank() &&
+                password.isNotBlank() &&
+                password.length >= 6 &&
+                fullName.isNotBlank() &&
+                fullName.contains(" ") && // Проверяем, что есть пробел (имя и фамилия)
+                consentGiven
+    }
+
     LaunchedEffect(resultState) {
         if (resultState is ResultState.Success) {
             delay(2000)
-            navController.navigate("signIn") {
-                popUpTo("signUp") { inclusive = true }
+            navController.navigate("signInScreen") {
+                popUpTo("signUpScreen") { inclusive = true }
             }
             viewModel.resetState()
         }
@@ -53,52 +63,52 @@ fun SignUpScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Create Account",
+                text = "Регистрация",
                 style = MaterialTheme.typography.headlineMedium
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Поля для имени и фамилии (опционально)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = registerRequest.firstName ?: "",
-                    onValueChange = { viewModel.updateFirstName(it) },
-                    label = { Text("First Name") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-
-                OutlinedTextField(
-                    value = registerRequest.lastName ?: "",
-                    onValueChange = { viewModel.updateLastName(it) },
-                    label = { Text("Last Name") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
+            // 1. Имя и фамилия (теперь сверху)
             OutlinedTextField(
-                value = registerRequest.email,
+                value = fullName,
+                onValueChange = { viewModel.updateFullName(it) },
+                label = { Text("Имя и фамилия") },
+                placeholder = { Text("Иван Петров") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                isError = resultState is ResultState.Error && fullName.isBlank(),
+                supportingText = {
+                    if (fullName.isNotBlank() && !fullName.contains(" ")) {
+                        Text(
+                            text = "Введите имя и фамилию через пробел",
+                            color = Color.Red,
+                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                        )
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 2. Email
+            OutlinedTextField(
+                value = email,
                 onValueChange = { viewModel.updateEmail(it) },
                 label = { Text("Email") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth(),
-                isError = resultState is ResultState.Error
+                isError = resultState is ResultState.Error && email.isBlank()
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
+            // 3. Пароль
             OutlinedTextField(
-                value = registerRequest.password,
+                value = password,
                 onValueChange = { viewModel.updatePassword(it) },
-                label = { Text("Password") },
+                label = { Text("Пароль") },
                 singleLine = true,
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -108,62 +118,74 @@ fun SignUpScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                isError = resultState is ResultState.Error
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = { viewModel.updateConfirmPassword(it) },
-                label = { Text("Confirm Password") },
-                singleLine = true,
-                visualTransformation = if (showConfirmPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { showConfirmPassword = !showConfirmPassword }) {
-                        Text(if (showConfirmPassword) "🙈" else "👁️")
+                isError = resultState is ResultState.Error && password.length < 6,
+                supportingText = {
+                    if (password.isNotBlank() && password.length < 6) {
+                        Text(
+                            text = "Пароль должен быть не менее 6 символов",
+                            color = Color.Red,
+                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                        )
                     }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                isError = resultState is ResultState.Error
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            when (resultState) {
+            // Чекбокс согласия
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { viewModel.updateConsent(!consentGiven) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = consentGiven,
+                    onCheckedChange = { viewModel.updateConsent(it) }
+                )
+                Text(
+                    text = "Даю согласие на обработку персональных данных",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Кнопка регистрации и статусы
+            when (val state = resultState) {
                 is ResultState.Loading -> {
                     CircularProgressIndicator()
                 }
                 is ResultState.Error -> {
                     Text(
-                        text = (resultState as ResultState.Error).message,
+                        text = state.message,
                         color = Color.Red,
                         modifier = Modifier.padding(8.dp)
                     )
 
                     Button(
                         onClick = { viewModel.signUp() },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = isFormValid  // Кнопка активна только при валидной форме
                     ) {
-                        Text("Sign Up")
+                        Text("Зарегистрироваться")
                     }
                 }
                 is ResultState.Success -> {
                     Text(
-                        text = (resultState as ResultState.Success).message,
+                        text = state.message,
                         color = Color.Green,
                         modifier = Modifier.padding(8.dp)
                     )
                     CircularProgressIndicator(modifier = Modifier.size(24.dp))
                 }
-                else -> {
+                ResultState.Init -> {
                     Button(
                         onClick = { viewModel.signUp() },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = viewModel.validateForm()
+                        enabled = isFormValid  // Кнопка активна только при валидной форме
                     ) {
-                        Text("Sign Up")
+                        Text("Зарегистрироваться")
                     }
                 }
             }
@@ -173,12 +195,12 @@ fun SignUpScreen(
             // Ссылка на вход
             TextButton(
                 onClick = {
-                    navController.navigate("signIn") {
-                        popUpTo("signUp") { inclusive = true }
+                    navController.navigate("signInScreen") {
+                        popUpTo("signUpScreen") { inclusive = true }
                     }
                 }
             ) {
-                Text("Already have an account? Sign In")
+                Text("Уже есть аккаунт? Войти")
             }
         }
     }
