@@ -6,6 +6,10 @@ class AppSession {
 
     val currentLogin : LoginResponse? get() = _currentLogin
 
+    val userId: String
+        get() = requireNotNull(_currentLogin?.user?.id) {
+            "User not authorized"
+        }
     val isAuth: Boolean get() = _currentLogin != null
 
     fun setSession(loginResponse: LoginResponse){

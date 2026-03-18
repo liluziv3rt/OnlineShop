@@ -31,7 +31,6 @@ import com.example.onlineshop.presentation.model.ResultState
 import com.example.onlineshop.presentation.viewmodel.SignInViewModel
 import kotlinx.coroutines.delay
 
-// presentation/screens/SignInScreen.kt
 @Composable
 fun SignInScreen(
     navController: NavController,
@@ -43,8 +42,8 @@ fun SignInScreen(
     LaunchedEffect(resultState) {
         if (resultState is ResultState.Success) {
             delay(1000)
-            navController.navigate("listBookScreen") {
-                popUpTo("signInScreen") { inclusive = true }
+            navController.navigate("main") {
+                popUpTo("signIn") { inclusive = true }
             }
         }
     }

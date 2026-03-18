@@ -3,8 +3,10 @@ package com.example.onlineshop.di
 import com.example.onlineshop.data.remote.ApiFactory
 import com.example.onlineshop.data.remote.ApiService
 import com.example.onlineshop.data.repository.AuthRepositoryImpl
+import com.example.onlineshop.data.repository.ProductRepositoryImpl
 import com.example.onlineshop.domain.model.AppSession
 import com.example.onlineshop.domain.repository.AuthRepository
+import com.example.onlineshop.domain.repository.ProductRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,6 +31,15 @@ object NetworkModule {
     ): AuthRepository {
         return AuthRepositoryImpl(apiService, appSession)
     }
+
+    @Provides
+    @Singleton
+    fun provideProductRepository(
+        apiService: ApiService,
+        appSession: AppSession
+    ): ProductRepository {
+        return ProductRepositoryImpl(apiService, appSession)
+    }
 }
 
 @Module
@@ -41,3 +52,4 @@ object AppModule {
         return AppSession()
     }
 }
+
