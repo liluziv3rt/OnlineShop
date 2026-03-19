@@ -51,22 +51,22 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun toggleFavourite(productId: String) {
-        val filter = "eq.${session.userId}"                       // ← форматируем
-        val favs = api.getFavourites(filter)
-
+        val userFilter = "eq.${session.userId}"
+        val productFilter = "eq.$productId"   // добавляем оператор
+        val favs = api.getFavourites(userFilter)
         if (favs.any { it.product_id == productId }) {
-            api.removeFromFavourite(productId, filter)            // ← исправлено
+            api.removeFromFavourite(productFilter, userFilter)   // используем оба фильтра
         } else {
-            api.addToFavourite(FavouriteDto(productId, session.userId)) // этот метод, возможно, не требует фильтра
+            api.addToFavourite(FavouriteDto(productId, session.userId))
         }
     }
 
     override suspend fun toggleCart(productId: String) {
-        val filter = "eq.${session.userId}"                       // ← форматируем
-        val cart = api.getCart(filter)
-
+        val userFilter = "eq.${session.userId}"
+        val productFilter = "eq.$productId"   // добавляем оператор
+        val cart = api.getCart(userFilter)
         if (cart.any { it.product_id == productId }) {
-            api.removeFromCart(productId, filter)                 // ← исправлено
+            api.removeFromCart(productFilter, userFilter)        // используем оба фильтра
         } else {
             api.addToCart(CartDto(productId, session.userId, 1))
         }

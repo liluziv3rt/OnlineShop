@@ -11,6 +11,7 @@ import com.example.onlineshop.data.dto.ProductDto
 import com.example.onlineshop.data.dto.ProfileDto
 import com.example.onlineshop.data.dto.RegisterRequestDto
 import com.example.onlineshop.data.dto.UserDto
+import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
@@ -59,9 +60,10 @@ interface ApiService {
 
     @DELETE("rest/v1/favourite")
     suspend fun removeFromFavourite(
-        @Query("product_id") productId: String,
-        @Query("user_id") userId: String
-    )
+        @Query("product_id") productFilter: String,
+        @Query("user_id") userFilter: String
+    ) : Response<Unit>
+
 
     // ---------- Корзина (требуется авторизация) ----------
     @GET("rest/v1/cart")
@@ -74,7 +76,8 @@ interface ApiService {
     suspend fun removeFromCart(
         @Query("product_id") productId: String,
         @Query("user_id") userId: String
-    )
+    ) : Response<Unit>
+
 }
 
 
