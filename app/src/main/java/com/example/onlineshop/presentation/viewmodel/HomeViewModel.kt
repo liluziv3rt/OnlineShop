@@ -26,6 +26,12 @@ class HomeViewModel @Inject constructor(
     var products = mutableStateListOf<Product>()
         private set
 
+    var showAllProducts by mutableStateOf(false)
+        private set
+
+    var showAllActions by mutableStateOf(false)
+        private set
+
     var categories = mutableStateListOf<Category>()
         private set
 
@@ -46,6 +52,18 @@ class HomeViewModel @Inject constructor(
         load()
         loadCategories()
         loadActions()
+    }
+
+    fun toggleProductsShowAll() {
+        showAllProducts = !showAllProducts
+    }
+
+    fun toggleActionsShowAll() {
+        showAllActions = !showAllActions
+    }
+
+    fun toggleShowAllProducts() {
+        showAllProducts = !showAllProducts
     }
 
     fun load() {

@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,10 +61,6 @@ fun HomeScreen(
     val actions = viewModel.actions
     val errorMessage = viewModel.errorMessage
 
-    LaunchedEffect(Unit) {
-        // load уже вызывается в init, но можно оставить для перезагрузки
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,8 +70,15 @@ fun HomeScreen(
         Spacer(Modifier.height(12.dp))
         SearchBar()
         Spacer(Modifier.height(16.dp))
-        ActionsRow(actions)
-        Spacer(Modifier.height(16.dp))
+
+        // Блок акций (только первая акция)
+        if (actions.isNotEmpty()) {
+            Text("Акции", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(8.dp))
+            ActionItem(action = actions.first())
+            Spacer(Modifier.height(16.dp))
+        }
+
         CategoryRow(
             categories = categories,
             selectedId = viewModel.selectedCategoryId,
@@ -82,18 +88,28 @@ fun HomeScreen(
 
         if (errorMessage != null) {
             Text(
-                text = errorMessage!!,
+                text = errorMessage,
                 color = Color.Red,
                 modifier = Modifier.padding(8.dp)
             )
         }
 
+        // Заголовок "Популярное" с кнопкой
+        SectionHeader(
+            title = "Популярное",
+            showAll = viewModel.showAllProducts,
+            onToggleShowAll = viewModel::toggleShowAllProducts
+        )
+        Spacer(Modifier.height(8.dp))
+
+        // Сетка товаров (отображаем 2 или все)
+        val displayedProducts = if (viewModel.showAllProducts) products else products.take(2)
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(products) { product ->
+            items(displayedProducts) { product ->
                 ProductCard(
                     product = product,
                     onFav = { viewModel.toggleFav(product.id) },
@@ -245,19 +261,36 @@ fun CategoryRow(
 }
 
 @Composable
-fun ActionsRow(actions: List<Action>) {
-
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-
-        items(actions) { action ->
-
-            AsyncImage(
-                model = action.imageUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(width = 300.dp, height = 120.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            )
+fun SectionHeader(
+    title: String,
+    showAll: Boolean,
+    onToggleShowAll: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        TextButton(onClick = onToggleShowAll) {
+            Text(if (showAll) "Свернуть" else "Все")
         }
     }
+}
+
+@Composable
+fun ActionItem(action: Action) {
+    AsyncImage(
+        model = action.imageUrl,
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .clip(RoundedCornerShape(16.dp))
+    )
 }
