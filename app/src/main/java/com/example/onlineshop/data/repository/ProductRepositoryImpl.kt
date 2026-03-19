@@ -3,6 +3,7 @@ package com.example.onlineshop.data.repository
 import android.util.Log
 import com.example.onlineshop.data.dto.CartDto
 import com.example.onlineshop.data.dto.FavouriteDto
+import com.example.onlineshop.data.dto.UpdateProfileDto
 import com.example.onlineshop.data.remote.ApiService
 import com.example.onlineshop.domain.model.Action
 import com.example.onlineshop.domain.model.AppSession
@@ -109,4 +110,32 @@ class ProductRepositoryImpl(
             null
         }
     }
+
+    override suspend fun updateUserProfile(profile: UserProfile) {
+        try {
+            val filter = "eq.${profile.id}"
+            val token = session.currentLogin?.accessToken ?: throw Exception("No token")
+
+            val updateDto = UpdateProfileDto(
+                firstname = profile.firstName ?: "",
+                lastname = profile.lastName ?: "",
+                address = profile.address,
+                phone = profile.phone,
+                photo = profile.photoUrl
+            )
+
+            val response = api.updateProfileAsync("Bearer $token", filter, updateDto)
+
+            if (!response.isSuccessful) {
+                throw Exception("Failed to update profile: ${response.code()}")
+            }
+
+            Log.d("ProductRepository", "Profile updated successfully")
+        } catch (e: Exception) {
+            Log.e("ProductRepository", "Error updating profile", e)
+            throw e
+        }
+    }
+
+
 }

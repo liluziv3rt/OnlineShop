@@ -15,4 +15,6 @@ interface ProductRepository {
 
     suspend fun getUserProfile(userId: String): UserProfile?
 
+    suspend fun updateUserProfile(profile: UserProfile)
+
 }

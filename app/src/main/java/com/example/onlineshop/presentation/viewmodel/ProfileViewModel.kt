@@ -45,8 +45,21 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val profile = repository.getUserProfile(session.userId)
-                _userProfile.value = profile
+                // Сначала пробуем взять из сессии
+                session.currentLogin?.user?.let { user ->
+                    _userProfile.value = UserProfile(
+                        id = user.id,
+                        firstName = user.firstName ?: "",
+                        lastName = user.lastName ?: "",
+                        photoUrl = user.photo,
+                        address = user.address ?: "Не указано",
+                        phone = user.phone ?: "Не указан"
+                    )
+                } ?: run {
+                    // Если в сессии нет, загружаем из БД
+                    val profile = repository.getUserProfile(session.userId)
+                    _userProfile.value = profile
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 _userProfile.value = null

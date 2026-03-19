@@ -10,6 +10,7 @@ import com.example.onlineshop.data.dto.LoginResponseDto
 import com.example.onlineshop.data.dto.ProductDto
 import com.example.onlineshop.data.dto.ProfileDto
 import com.example.onlineshop.data.dto.RegisterRequestDto
+import com.example.onlineshop.data.dto.UpdateProfileDto
 import com.example.onlineshop.data.dto.UserDto
 import retrofit2.Response
 import retrofit2.http.*
@@ -24,6 +25,13 @@ interface ApiService {
 
     @POST("auth/v1/logout")
     suspend fun logoutAsync(@Header("Authorization") authorization: String)
+
+    @PATCH("rest/v1/profiles")
+    suspend fun updateProfileAsync(
+        @Header("Authorization") authorization: String,
+        @Query("user_id") filter: String,
+        @Body profile: UpdateProfileDto
+    ): Response<Unit>
 
     @GET("rest/v1/profiles")
     suspend fun getProfileAsync(

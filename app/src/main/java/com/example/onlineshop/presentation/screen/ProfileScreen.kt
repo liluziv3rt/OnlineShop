@@ -30,6 +30,10 @@ fun ProfileScreen(
     val userProfileState by viewModel.userProfile.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+
+    LaunchedEffect(Unit) {
+        viewModel.loadUserProfile()
+    }
     // Сохраняем в локальную переменную
     val userProfile = userProfileState
 
@@ -76,13 +80,14 @@ fun ProfileScreen(
                             color = Color.Black
                         )
 
-                        IconButton(onClick = { /* TODO: редактирование */ }) {
+                        IconButton(onClick = { navController.navigate("edit_profile") }) {
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = "Редактировать",
                                 tint = Color.Black
                             )
                         }
+
                     }
                 }
 
