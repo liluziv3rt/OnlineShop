@@ -110,7 +110,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getUserWithProfile(userId: String, token: String): User {
-        val filter = "eq.$userId"  // добавляем eq.
+        val filter = "eq.$userId"
         Log.d("AuthRepo", "getUserWithProfile: filter=$filter")
 
         val profile = try {
@@ -126,7 +126,7 @@ class AuthRepositoryImpl @Inject constructor(
             email = "",
             firstName = profile?.firstname,
             lastName = profile?.lastname,
-            photo = profile?.photo,        // не забудьте фото
+            photo = profile?.photo,
             address = profile?.address,
             phone = profile?.phone
         )

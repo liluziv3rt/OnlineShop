@@ -28,7 +28,7 @@ interface ApiService {
     @GET("rest/v1/profiles")
     suspend fun getProfileAsync(
         @Header("Authorization") authorization: String,
-        @Query("user_id") filter: String   // фильтр по user_id
+        @Query("user_id") filter: String
     ): List<ProfileDto>
 
     @GET("auth/v1/user")

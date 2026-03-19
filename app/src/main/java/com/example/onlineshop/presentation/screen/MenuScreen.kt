@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -23,74 +24,66 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.onlineshop.presentation.viewmodel.MenuViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuScreen(
     navController: NavController,
     viewModel: MenuViewModel = hiltViewModel()
 ) {
-    val userProfile by viewModel.userProfile.collectAsState()
-    val profile = userProfile
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Меню") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
-                )
-            )
-        }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Шапка с аватаром и именем
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (profile?.photo != null) {
-                        AsyncImage(
-                            model = profile.photo,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(60.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .size(60.dp)
-                                .clip(CircleShape)
-                                .background(Color.Gray)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        val user = userProfile // это User? из сессии
-                        val fullName = listOfNotNull(user?.firstName, user?.lastName)
-                            .joinToString(" ")
-                            .ifBlank { "Пользователь" }
+    val user by viewModel.userProfile.collectAsState()
+    val currentUser = user
 
-                        Text(
-                            text = fullName,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+    // Светло-голубой фон
+    val backgroundColor = Color(0xFFE6F3FF) // Чуть светлее, как на макете
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Верхний отступ
+            item {
+                Spacer(modifier = Modifier.height(48.dp))
+            }
+
+            // Большая аватарка
+            item {
+                if (currentUser?.photo != null) {
+                    AsyncImage(
+                        model = currentUser.photo,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                    )
                 }
-                Divider()
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Имя и фамилия
+            item {
+                Text(
+                    text = listOfNotNull(currentUser?.firstName, currentUser?.lastName)
+                        .joinToString(" ")
+                        .ifBlank { "Пользователь" },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
 
             // Пункты меню
@@ -102,32 +95,88 @@ fun MenuScreen(
                 MenuItem("Уведомления", Icons.Default.Notifications),
                 MenuItem("Настройки", Icons.Default.Settings)
             )
-            items(menuItems.size) { index ->
-                val item = menuItems[index]
+
+            items(menuItems) { item ->
                 ListItem(
-                    headlineContent = { Text(item.title) },
-                    leadingContent = { Icon(item.icon, null) },
-                    modifier = Modifier.clickable {
-                        // Здесь можно добавить навигацию позже
-                        // Например, navController.navigate(item.route)
-                    }
+                    headlineContent = {
+                        Text(
+                            text = item.title,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Black,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(end = 8.dp)
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            when (item.title) {
+                                "Профиль" -> navController.navigate("profile")
+                                "Корзина" -> navController.navigate("cart")
+                                "Избранное" -> navController.navigate("favorites")
+                                "Заказы" -> navController.navigate("orders")
+                                "Уведомления" -> navController.navigate("notifications")
+                                "Настройки" -> navController.navigate("settings")
+                            }
+                        },
+                    colors = ListItemDefaults.colors(
+                        containerColor = Color.Transparent
+                    )
                 )
             }
 
-            // Выход
+            // Дополнительный отступ перед кнопкой выхода
             item {
-                Divider()
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            // Кнопка выхода
+            item {
                 ListItem(
-                    headlineContent = { Text("Выйти") },
-                    leadingContent = { Icon(Icons.Default.ExitToApp, null) },
-                    modifier = Modifier.clickable {
-                        viewModel.logout()
-                        navController.navigate("signIn") {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+                    headlineContent = {
+                        Text(
+                            text = "Выйти",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Red,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.ExitToApp,
+                            contentDescription = null,
+                            tint = Color.Red,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(end = 8.dp)
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            viewModel.logout()
+                            navController.navigate("signIn") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        },
+                    colors = ListItemDefaults.colors(
+                        containerColor = Color.Transparent
+                    )
                 )
             }
+
+
         }
     }
 }
