@@ -363,7 +363,7 @@ fun ActionItem(action: Action) {
 @Composable
 fun BottomBar(navController: NavController) {
     val items = listOf(
-        BottomNavItem("home", Icons.Default.Home),
+        BottomNavItem("main", Icons.Default.Home),
         BottomNavItem("favorites", Icons.Default.FavoriteBorder),
         BottomNavItem("cart", Icons.Default.ShoppingCart),
         BottomNavItem("notifications", Icons.Default.Notifications),
