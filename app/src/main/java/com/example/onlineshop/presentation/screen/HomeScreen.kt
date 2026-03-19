@@ -52,7 +52,6 @@ fun HomeScreen(
                 .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Верхняя панель (меню, заголовок, корзина)
             item {
                 Row(
                     modifier = Modifier
@@ -61,7 +60,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = { /* открыть меню */ }) {
+                    IconButton(onClick = { navController.navigate("menu") }) {
                         Icon(Icons.Default.Menu, contentDescription = "Меню")
                     }
                     Text(

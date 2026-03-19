@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.onlineshop.domain.model.Action
 import com.example.onlineshop.domain.model.Category
 import com.example.onlineshop.domain.model.Product
+import com.example.onlineshop.domain.model.UserProfile
 import com.example.onlineshop.domain.repository.ProductRepository
 import com.example.onlineshop.domain.usecase.GetCategoriesUseCase
 import com.example.onlineshop.domain.usecase.GetProductsUseCase
@@ -29,6 +30,8 @@ class HomeViewModel @Inject constructor(
     var showAllProducts by mutableStateOf(false)
         private set
 
+    var userProfile by mutableStateOf<UserProfile?>(null)
+
     var showAllActions by mutableStateOf(false)
         private set
 
@@ -46,6 +49,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         loadAllData()
+
     }
 
     private fun loadAllData() {

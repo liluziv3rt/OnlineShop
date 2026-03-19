@@ -1,5 +1,6 @@
 package com.example.onlineshop.data.remote
 
+import android.util.Log
 import com.example.onlineshop.domain.model.AppSession
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -18,19 +19,18 @@ object ApiFactory {
         }
 
 
-        val client = OkHttpClient
-            .Builder()
-            .addInterceptor(loggingInterceptor) // Добавляем ПЕРВЫМ
+        val client = OkHttpClient.Builder()
             .addInterceptor(AuthInter(appSession))
             .addInterceptor { chain ->
-                // Добавляем apikey для всех запросов
                 val request = chain.request()
                     .newBuilder()
                     .addHeader("apikey", SUPABASE_API_KEY)
                     .addHeader("Content-Type", "application/json")
                     .build()
+                Log.d("ApiFactory", "Adding apikey to ${request.url}")
                 chain.proceed(request)
             }
+            .addInterceptor(loggingInterceptor)  // теперь последним
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build()

@@ -28,7 +28,7 @@ interface ApiService {
     @GET("rest/v1/profiles")
     suspend fun getProfileAsync(
         @Header("Authorization") authorization: String,
-        @Query("id") filter: String   // теперь передаём "eq.uuid"
+        @Query("user_id") filter: String   // фильтр по user_id
     ): List<ProfileDto>
 
     @GET("auth/v1/user")
@@ -40,10 +40,6 @@ interface ApiService {
 
     @GET("rest/v1/products")
     suspend fun getProductsByCategory(@Query("category_id") filter: String): List<ProductDto>
-
-
-    @GET("rest/v1/products")
-    suspend fun searchProducts(@Query("title") query: String): List<ProductDto>
 
     @GET("rest/v1/categories")
     suspend fun getCategories(): List<CategoryDto>

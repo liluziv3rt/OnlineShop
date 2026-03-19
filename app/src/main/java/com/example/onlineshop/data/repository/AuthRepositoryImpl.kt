@@ -78,7 +78,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun getProfileAsync(userId: String): User? {
         return try {
             val token = appSession.currentLogin?.accessToken ?: return null
-            val profiles = apiService.getProfileAsync("Bearer $token", userId)
+            val filter = "eq.$userId"
+            val profiles = apiService.getProfileAsync("Bearer $token", filter)
             profiles.firstOrNull()?.let { profile ->
                 User(
                     id = profile.id,
@@ -109,24 +110,27 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getUserWithProfile(userId: String, token: String): User {
+        val filter = "eq.$userId"  // добавляем eq.
+        Log.d("AuthRepo", "getUserWithProfile: filter=$filter")
+
         val profile = try {
-            val profiles = apiService.getProfileAsync("Bearer $token", userId)
+            val profiles = apiService.getProfileAsync("Bearer $token", filter)
             profiles.firstOrNull()
         } catch (e: Exception) {
+            Log.e("AuthRepo", "Error loading profile", e)
             null
         }
 
         return User(
             id = userId,
-            email = "", // email будет добавлен позже
+            email = "",
             firstName = profile?.firstname,
             lastName = profile?.lastname,
-            photo = profile?.photo,
+            photo = profile?.photo,        // не забудьте фото
             address = profile?.address,
             phone = profile?.phone
         )
     }
-
     private fun mapToDomain(dto: LoginResponseDto, user: User): LoginResponse {
         return LoginResponse(
             accessToken = dto.access_token,
