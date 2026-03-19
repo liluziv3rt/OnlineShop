@@ -3,11 +3,10 @@ package com.example.onlineshop.presentation.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -46,83 +45,111 @@ fun HomeScreen(
     Scaffold(
         bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Верхняя панель (меню, заголовок, корзина)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = { /* открыть меню */ }) {
-                    Icon(Icons.Default.Menu, contentDescription = "Меню")
-                }
-                Text(
-                    text = "Главная",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                IconButton(onClick = { /* перейти в корзину */ }) {
-                    Icon(Icons.Default.ShoppingCart, contentDescription = "Корзина")
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { /* открыть меню */ }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Меню")
+                    }
+                    Text(
+                        text = "Главная",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(onClick = { /* перейти в корзину */ }) {
+                        Icon(Icons.Default.ShoppingCart, contentDescription = "Корзина")
+                    }
                 }
             }
 
-            // Поиск с иконкой фильтра справа
-            SearchBarWithFilter()
-
-            Spacer(modifier = Modifier.height(16.dp))
+            // Поиск с иконкой фильтра
+            item {
+                SearchBarWithFilter()
+            }
 
             // Категории
-            CategoryRow(
-                categories = categories,
-                selectedId = viewModel.selectedCategoryId,
-                onSelect = viewModel::selectCategory
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (errorMessage != null) {
-                Text(
-                    text = errorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(8.dp)
+            item {
+                CategoryRow(
+                    categories = categories,
+                    selectedId = viewModel.selectedCategoryId,
+                    onSelect = viewModel::selectCategory
                 )
             }
 
             // Заголовок "Популярное" с кнопкой Все/Свернуть
-            SectionHeader(
-                title = "Популярное",
-                showAll = showAllProducts,
-                onToggleShowAll = viewModel::toggleShowAllProducts
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Сетка товаров (первые два или все)
-            val displayedProducts = if (showAllProducts) products else products.take(2)
-            ProductsGrid(
-                products = displayedProducts,
-                onFav = { viewModel.toggleFav(it) },
-                onCart = { viewModel.toggleCart(it) }
-            )
-
-            // Акции (одна)
-            if (actions.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Акции",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+            item {
+                SectionHeader(
+                    title = "Популярное",
+                    showAll = showAllProducts,
+                    onToggleShowAll = viewModel::toggleShowAllProducts
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                ActionItem(action = actions.first()) // просто картинка, без текста
+            }
+
+            // Товары (первые два или все)
+            val displayedProducts = if (showAllProducts) products else products.take(2)
+            items(displayedProducts.chunked(2)) { chunk ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    chunk.forEach { product ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            ProductCard(
+                                product = product,
+                                onFav = { viewModel.toggleFav(product.id) },
+                                onCart = { viewModel.toggleCart(product.id) }
+                            )
+                        }
+                    }
+                    if (chunk.size == 1) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+
+            // Акции
+            if (actions.isNotEmpty()) {
+                item {
+                    Text(
+                        text = "Акции",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+                item {
+                    ActionItem(action = actions.first())
+                }
+            }
+
+            // Ошибка (если есть)
+            if (errorMessage != null) {
+                item {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+
+            // Небольшой отступ снизу
+            item {
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -218,43 +245,6 @@ fun SectionHeader(
 }
 
 @Composable
-fun ProductsGrid(
-    products: List<Product>,
-    onFav: (String) -> Unit,
-    onCart: (String) -> Unit
-) {
-    val chunked = products.chunked(2)
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    ) {
-        chunked.forEachIndexed { index, chunk ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                chunk.forEach { product ->
-                    Box(modifier = Modifier.weight(1f)) {
-                        ProductCard(
-                            product = product,
-                            onFav = { onFav(product.id) },
-                            onCart = { onCart(product.id) }
-                        )
-                    }
-                }
-                if (chunk.size == 1) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-            if (index < chunked.lastIndex) {
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-        }
-    }
-}
-
-@Composable
 fun ProductCard(
     product: Product,
     onFav: () -> Unit,
@@ -273,7 +263,6 @@ fun ProductCard(
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            // Изображение
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -287,7 +276,6 @@ fun ProductCard(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
-                // Кнопка избранного
                 IconButton(
                     onClick = onFav,
                     modifier = Modifier
@@ -304,7 +292,6 @@ fun ProductCard(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // BEST SELLER
             if (product.isBestSeller) {
                 Text(
                     text = "BEST SELLER",
@@ -318,7 +305,6 @@ fun ProductCard(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Название
             Text(
                 text = product.title,
                 fontSize = 14.sp,
@@ -328,7 +314,6 @@ fun ProductCard(
                 modifier = Modifier.padding(top = 2.dp)
             )
 
-            // Цена
             Text(
                 text = "${product.cost} ₽",
                 fontSize = 14.sp,
@@ -339,7 +324,6 @@ fun ProductCard(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Кнопка добавления в корзину
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -395,7 +379,6 @@ fun BottomBar(navController: NavController) {
         items.forEachIndexed { index, item ->
             when (index) {
                 2 -> {
-                    // Центральная кнопка корзины (выделенная)
                     Box(modifier = Modifier.weight(1f)) {
                         IconButton(
                             onClick = { navController.navigate(item.route) },
