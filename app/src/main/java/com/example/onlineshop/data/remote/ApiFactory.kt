@@ -15,7 +15,7 @@ object ApiFactory {
 
     fun create(appSession: AppSession): ApiService {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY // Логируем всё тело запроса и ответа
+            level = HttpLoggingInterceptor.Level.BODY
         }
 
 
@@ -30,7 +30,7 @@ object ApiFactory {
                 Log.d("ApiFactory", "Adding apikey to ${request.url}")
                 chain.proceed(request)
             }
-            .addInterceptor(loggingInterceptor)  // теперь последним
+            .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .build()

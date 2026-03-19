@@ -41,13 +41,11 @@ fun EditProfileScreen(
     val saveSuccess by viewModel.saveSuccess.collectAsState()
     val photoUri by viewModel.photoUri.collectAsState()
 
-    // Состояния для полей ввода
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
 
-    // Для выбора фото
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -57,7 +55,6 @@ fun EditProfileScreen(
         }
     }
 
-    // Обновляем поля когда профиль загрузился
     LaunchedEffect(userProfile) {
         firstName = userProfile?.firstName ?: ""
         lastName = userProfile?.lastName ?: ""
@@ -65,7 +62,6 @@ fun EditProfileScreen(
         phone = userProfile?.phone ?: ""
     }
 
-    // Обработка успешного сохранения
     LaunchedEffect(saveSuccess) {
         if (saveSuccess) {
             viewModel.resetSaveSuccess()
@@ -118,7 +114,6 @@ fun EditProfileScreen(
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
             ) {
-                // Аватар с возможностью изменения
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -182,7 +177,6 @@ fun EditProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Поле для имени
                 item {
                     Text(
                         text = "Имя",
@@ -207,7 +201,6 @@ fun EditProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Поле для фамилии
                 item {
                     Text(
                         text = "Фамилия",
@@ -232,7 +225,6 @@ fun EditProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Поле для адреса
                 item {
                     Text(
                         text = "Адрес",
@@ -257,7 +249,6 @@ fun EditProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Поле для телефона
                 item {
                     Text(
                         text = "Телефон",
@@ -282,7 +273,6 @@ fun EditProfileScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
-                // Кнопки
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -309,7 +299,6 @@ fun EditProfileScreen(
                             )
                         }
 
-                        // Кнопка сохранения
                         Button(
                             onClick = {
                                 viewModel.updateProfile(firstName, lastName, address, phone)
@@ -340,7 +329,6 @@ fun EditProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Сообщение об ошибке
                 if (error != null) {
                     item {
                         Text(
@@ -352,7 +340,6 @@ fun EditProfileScreen(
                     }
                 }
 
-                // Нижний отступ
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                 }

@@ -1,4 +1,3 @@
-// domain/usecase/RegisterUseCase.kt
 package com.example.onlineshop.domain.usecase
 
 import com.example.onlineshop.domain.model.AppSession
@@ -15,11 +14,8 @@ class RegisterUseCase @Inject constructor(
 
     suspend operator fun invoke(registerRequest: RegisterRequest): CustomResult<Unit> {
         return try {
-            // Разбираем имя на firstname и lastname
-            val parsedName = NameParser.parseFullName(registerRequest.fullName)
 
-            // Здесь можно сохранить факт согласия, если нужно
-            // Например, в отдельную таблицу или в метаданные
+            val parsedName = NameParser.parseFullName(registerRequest.fullName)
 
             val response = authRepository.registerAsync(
                 email = registerRequest.email,

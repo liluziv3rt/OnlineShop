@@ -19,7 +19,7 @@ object NameParser {
             else -> {
                 ParsedName(
                     firstName = parts[0],
-                    lastName = parts.drop(1).joinToString(" ") // Все остальное - фамилия
+                    lastName = parts.drop(1).joinToString(" ")
                 )
             }
         }

@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.anotherexamrepeat.presentation.screen.SignInScreen
 import com.example.onlineshop.presentation.screen.EditProfileScreen
+import com.example.onlineshop.presentation.screen.FavoritesScreen
 import com.example.onlineshop.presentation.screen.HomeScreen
 import com.example.onlineshop.presentation.screen.MenuScreen
 import com.example.onlineshop.presentation.screen.ProfileScreen
@@ -34,6 +35,10 @@ fun NavigationHost() {
 
         composable("edit_profile") {
             EditProfileScreen(navController = navController)
+        }
+
+        composable("favorites") {
+            FavoritesScreen(navController = navController)
         }
     }
 }

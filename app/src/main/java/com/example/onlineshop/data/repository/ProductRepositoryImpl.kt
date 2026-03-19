@@ -19,10 +19,10 @@ class ProductRepositoryImpl(
 
     override suspend fun getProducts(): List<Product> {
         val userId = session.userId
-        // Если userId пустой (например, до логина), то списки избранного/корзины пустые
+
         val favs = if (userId.isNotBlank()) {
             try {
-                api.getFavourites("eq.$userId")   // ← исправлено
+                api.getFavourites("eq.$userId")
             } catch (e: Exception) {
                 emptyList()
             }
@@ -30,13 +30,13 @@ class ProductRepositoryImpl(
 
         val cart = if (userId.isNotBlank()) {
             try {
-                api.getCart("eq.$userId")         // ← исправлено
+                api.getCart("eq.$userId")
             } catch (e: Exception) {
                 emptyList()
             }
         } else emptyList()
 
-        val products = api.getProducts() // этот запрос уже работает (200)
+        val products = api.getProducts()
 
         return products.map { dto ->
             Product(
@@ -55,10 +55,10 @@ class ProductRepositoryImpl(
 
     override suspend fun toggleFavourite(productId: String) {
         val userFilter = "eq.${session.userId}"
-        val productFilter = "eq.$productId"   // добавляем оператор
+        val productFilter = "eq.$productId"
         val favs = api.getFavourites(userFilter)
         if (favs.any { it.product_id == productId }) {
-            api.removeFromFavourite(productFilter, userFilter)   // используем оба фильтра
+            api.removeFromFavourite(productFilter, userFilter)
         } else {
             api.addToFavourite(FavouriteDto(productId, session.userId))
         }
@@ -66,10 +66,10 @@ class ProductRepositoryImpl(
 
     override suspend fun toggleCart(productId: String) {
         val userFilter = "eq.${session.userId}"
-        val productFilter = "eq.$productId"   // добавляем оператор
+        val productFilter = "eq.$productId"
         val cart = api.getCart(userFilter)
         if (cart.any { it.product_id == productId }) {
-            api.removeFromCart(productFilter, userFilter)        // используем оба фильтра
+            api.removeFromCart(productFilter, userFilter)
         } else {
             api.addToCart(CartDto(productId, session.userId, 1))
         }
@@ -97,7 +97,7 @@ class ProductRepositoryImpl(
             if (response.isNotEmpty()) {
                 val profile = response.first()
                 UserProfile(
-                    id = profile.id,           // добавить id
+                    id = profile.id,
                     firstName = profile.firstname ?: "",
                     lastName = profile.lastname ?: "",
                     photoUrl = profile.photo

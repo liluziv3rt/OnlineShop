@@ -38,7 +38,6 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    // data/repository/AuthRepositoryImpl.kt
     override suspend fun registerAsync(
         email: String,
         password: String,

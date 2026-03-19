@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -20,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.onlineshop.presentation.viewmodel.ProfileViewModel
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,11 +32,10 @@ fun ProfileScreen(
     val userProfileState by viewModel.userProfile.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-
     LaunchedEffect(Unit) {
         viewModel.loadUserProfile()
     }
-    // Сохраняем в локальную переменную
+
     val userProfile = userProfileState
 
     Scaffold(
@@ -87,7 +88,6 @@ fun ProfileScreen(
                                 tint = Color.Black
                             )
                         }
-
                     }
                 }
 
@@ -133,6 +133,58 @@ fun ProfileScreen(
                             .padding(horizontal = 16.dp)
                             .wrapContentWidth(Alignment.CenterHorizontally)
                     )
+                }
+
+
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            val barcodePattern = remember(userProfile?.id) {
+                                generateBarcodePattern(userProfile?.id ?: "123456789")
+                            }
+
+                            // Штрих-код
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(60.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                barcodePattern.forEach { width ->
+                                    Box(
+                                        modifier = Modifier
+                                            .width(width.dp)
+                                            .fillMaxHeight()
+                                            .background(Color.Black)
+                                    )
+                                    Spacer(modifier = Modifier.width(1.dp))
+                                }
+                            }
+
+                            // Цифры под штрих-кодом
+                            Text(
+                                text = userProfile?.id?.takeLast(8)?.chunked(4)?.joinToString(" ") ?: "0000 0000",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Black,
+                                modifier = Modifier.padding(top = 12.dp)
+                            )
+                        }
+                    }
                 }
 
                 // Поля профиля
@@ -202,4 +254,33 @@ fun ProfileField(
             modifier = Modifier.padding(top = 8.dp)
         )
     }
+}
+
+// Функция для генерации паттерна штрих-кода из ID
+// Замените функцию generateBarcodePattern на эту:
+
+private fun generateBarcodePattern(id: String): List<Int> {
+    val pattern = mutableListOf<Int>()
+    // Берем хеш от ID для генерации
+    val hash = id.hashCode().absoluteValue
+    val hashString = hash.toString() + id.takeLast(4)
+
+    // Каждая цифра дает разную комбинацию полосок
+    for (char in hashString) {
+        val digit = char.digitToIntOrNull() ?: 0
+        when (digit) {
+            0 -> pattern.addAll(listOf(2, 1, 2, 1, 2))
+            1 -> pattern.addAll(listOf(1, 2, 1, 2, 1))
+            2 -> pattern.addAll(listOf(2, 2, 1, 1, 2))
+            3 -> pattern.addAll(listOf(1, 1, 2, 2, 1))
+            4 -> pattern.addAll(listOf(2, 1, 1, 2, 2))
+            5 -> pattern.addAll(listOf(1, 2, 2, 1, 1))
+            6 -> pattern.addAll(listOf(2, 2, 2, 1, 1))
+            7 -> pattern.addAll(listOf(1, 1, 1, 2, 2))
+            8 -> pattern.addAll(listOf(2, 1, 2, 2, 1))
+            9 -> pattern.addAll(listOf(1, 2, 1, 1, 2))
+        }
+    }
+
+    return pattern
 }
