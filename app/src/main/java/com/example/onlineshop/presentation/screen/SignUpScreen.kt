@@ -1,17 +1,21 @@
 package com.example.onlineshop.presentation.screens
 
+import android.hardware.lights.LightState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.onlineshop.presentation.model.ResultState
@@ -31,21 +35,20 @@ fun SignUpScreen(
 
     var showPassword by remember { mutableStateOf(false) }
 
-    // Проверка, все ли поля заполнены и галочка нажата
+    // Акцентный цвет как на экране входа
+    val accentColor = Color(0xFF03A9F4)
+
+    // Проверка валидности формы (все поля заполнены, пароль >= 6, чекбокс отмечен)
     val isFormValid = remember(email, password, fullName, consentGiven) {
-        email.isNotBlank() &&
-                password.isNotBlank() &&
-                password.length >= 6 &&
-                fullName.isNotBlank() &&
-                fullName.contains(" ") && // Проверяем, что есть пробел (имя и фамилия)
-                consentGiven
+        email.isNotBlank() && password.length >= 6 && fullName.isNotBlank() && consentGiven
     }
 
     LaunchedEffect(resultState) {
         if (resultState is ResultState.Success) {
             delay(2000)
-            navController.navigate("signInScreen") {
-                popUpTo("signUpScreen") { inclusive = true }
+            // После успешной регистрации переходим на вход (или сразу на главную? по логике - на вход)
+            navController.navigate("signIn") {
+                popUpTo("signUp") { inclusive = true }
             }
             viewModel.resetState()
         }
@@ -54,7 +57,7 @@ fun SignUpScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 20.dp) // как в SignInScreen
     ) {
         Column(
             modifier = Modifier
@@ -62,36 +65,40 @@ fun SignUpScreen(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Заголовок и подзаголовок
             Text(
                 text = "Регистрация",
-                style = MaterialTheme.typography.headlineMedium
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            Text(
+                text = "Заполните Свои Данные",
+                fontSize = 15.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(top = 6.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // 1. Имя и фамилия (теперь сверху)
+            // Поле "Ваше имя"
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { viewModel.updateFullName(it) },
-                label = { Text("Имя и фамилия") },
-                placeholder = { Text("Иван Петров") },
+                label = { Text("Ваше имя") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                isError = resultState is ResultState.Error && fullName.isBlank(),
-                supportingText = {
-                    if (fullName.isNotBlank() && !fullName.contains(" ")) {
-                        Text(
-                            text = "Введите имя и фамилию через пробел",
-                            color = Color.Red,
-                            fontSize = MaterialTheme.typography.bodySmall.fontSize
-                        )
-                    }
-                }
+                shape = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = Color.LightGray,
+                    focusedLabelColor = accentColor
+                )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // 2. Email
+            // Поле Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { viewModel.updateEmail(it) },
@@ -99,12 +106,17 @@ fun SignUpScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth(),
-                isError = resultState is ResultState.Error && email.isBlank()
+                shape = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = Color.LightGray,
+                    focusedLabelColor = accentColor
+                )
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // 3. Пароль
+            // Поле Пароль
             OutlinedTextField(
                 value = password,
                 onValueChange = { viewModel.updatePassword(it) },
@@ -118,16 +130,12 @@ fun SignUpScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                isError = resultState is ResultState.Error && password.length < 6,
-                supportingText = {
-                    if (password.isNotBlank() && password.length < 6) {
-                        Text(
-                            text = "Пароль должен быть не менее 6 символов",
-                            color = Color.Red,
-                            fontSize = MaterialTheme.typography.bodySmall.fontSize
-                        )
-                    }
-                }
+                shape = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = Color.LightGray,
+                    focusedLabelColor = accentColor
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -141,11 +149,17 @@ fun SignUpScreen(
             ) {
                 Checkbox(
                     checked = consentGiven,
-                    onCheckedChange = { viewModel.updateConsent(it) }
+                    onCheckedChange = { viewModel.updateConsent(it) },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = accentColor,
+                        uncheckedColor = Color.Gray
+                    )
                 )
                 Text(
                     text = "Даю согласие на обработку персональных данных",
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp),
+                    fontSize = 14.sp,
+                    color = Color.Black
                 )
             }
 
@@ -154,7 +168,7 @@ fun SignUpScreen(
             // Кнопка регистрации и статусы
             when (val state = resultState) {
                 is ResultState.Loading -> {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = accentColor)
                 }
                 is ResultState.Error -> {
                     Text(
@@ -162,45 +176,55 @@ fun SignUpScreen(
                         color = Color.Red,
                         modifier = Modifier.padding(8.dp)
                     )
-
                     Button(
                         onClick = { viewModel.signUp() },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = isFormValid  // Кнопка активна только при валидной форме
+                        enabled = isFormValid,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            disabledContainerColor = accentColor.copy(alpha = 0.5f)
+                        )
                     ) {
-                        Text("Зарегистрироваться")
+                        Text("Зарегистрироваться", color = Color.White)
                     }
                 }
                 is ResultState.Success -> {
                     Text(
                         text = state.message,
-                        color = Color.Green,
+                        color = accentColor,
                         modifier = Modifier.padding(8.dp)
                     )
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = accentColor)
                 }
                 ResultState.Init -> {
                     Button(
                         onClick = { viewModel.signUp() },
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = isFormValid  // Кнопка активна только при валидной форме
+                        enabled = isFormValid,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            disabledContainerColor = accentColor.copy(alpha = 0.5f)
+                        )
                     ) {
-                        Text("Зарегистрироваться")
+                        Text("Зарегистрироваться", color = Color.White)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Ссылка на вход
             TextButton(
-                onClick = {
-                    navController.navigate("signInScreen") {
-                        popUpTo("signUpScreen") { inclusive = true }
-                    }
-                }
+                onClick = { navController.navigate("signIn") },
+                modifier = Modifier.padding(0.dp)
             ) {
-                Text("Уже есть аккаунт? Войти")
+                Text(
+                    text = "Есть аккаунт? Войти",
+                    color = Color.LightGray,
+                    fontSize = 14.sp
+                )
             }
         }
     }
