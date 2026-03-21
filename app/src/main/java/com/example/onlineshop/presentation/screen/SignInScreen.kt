@@ -36,13 +36,12 @@ fun SignInScreen(
         }
     }
 
-    // Яркий голубой цвет
     val accentColor = Color(0xFF03A9F4)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp) // компактные отступы
+            .padding(horizontal = 20.dp)
     ) {
         Column(
             modifier = Modifier
@@ -50,7 +49,6 @@ fun SignInScreen(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Заголовки
             Text(
                 text = "Привет!",
                 fontSize = 30.sp,
@@ -66,7 +64,6 @@ fun SignInScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Поле Email
             OutlinedTextField(
                 value = loginRequest.email,
                 onValueChange = { viewModel.updateLoginRequest(loginRequest.copy(email = it)) },
@@ -84,7 +81,6 @@ fun SignInScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Поле Пароль
             OutlinedTextField(
                 value = loginRequest.password,
                 onValueChange = { viewModel.updateLoginRequest(loginRequest.copy(password = it)) },
@@ -120,7 +116,6 @@ fun SignInScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Кнопка входа
             when (resultState) {
                 is ResultState.Loading -> {
                     CircularProgressIndicator(color = accentColor)
@@ -166,7 +161,6 @@ fun SignInScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Ссылка на регистрацию
             TextButton(
                 onClick = { navController.navigate("signUp") },
                 modifier = Modifier.padding(0.dp)

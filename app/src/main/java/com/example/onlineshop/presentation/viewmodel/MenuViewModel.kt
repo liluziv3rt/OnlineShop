@@ -25,10 +25,7 @@ class MenuViewModel @Inject constructor(
 
     init {
         Log.d("MenuViewModel", "init: user from session = ${session.currentLogin?.user?.firstName} ${session.currentLogin?.user?.lastName}")
-        // Если в сессии нет, можно загрузить, но пока уберём
-        // if (session.currentLogin == null) {
-        //     loadUserProfile()
-        // }
+
     }
 
     fun logout() {

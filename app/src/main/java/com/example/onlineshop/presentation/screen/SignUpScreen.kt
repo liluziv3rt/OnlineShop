@@ -35,10 +35,8 @@ fun SignUpScreen(
 
     var showPassword by remember { mutableStateOf(false) }
 
-    // Акцентный цвет как на экране входа
     val accentColor = Color(0xFF03A9F4)
 
-    // Проверка валидности формы (все поля заполнены, пароль >= 6, чекбокс отмечен)
     val isFormValid = remember(email, password, fullName, consentGiven) {
         email.isNotBlank() && password.length >= 6 && fullName.isNotBlank() && consentGiven
     }
@@ -46,7 +44,6 @@ fun SignUpScreen(
     LaunchedEffect(resultState) {
         if (resultState is ResultState.Success) {
             delay(2000)
-            // После успешной регистрации переходим на вход (или сразу на главную? по логике - на вход)
             navController.navigate("signIn") {
                 popUpTo("signUp") { inclusive = true }
             }
@@ -57,7 +54,7 @@ fun SignUpScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp) // как в SignInScreen
+            .padding(horizontal = 20.dp)
     ) {
         Column(
             modifier = Modifier
@@ -65,7 +62,6 @@ fun SignUpScreen(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Заголовок и подзаголовок
             Text(
                 text = "Регистрация",
                 fontSize = 30.sp,
@@ -81,7 +77,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Поле "Ваше имя"
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { viewModel.updateFullName(it) },
@@ -98,7 +93,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Поле Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { viewModel.updateEmail(it) },
@@ -116,7 +110,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Поле Пароль
             OutlinedTextField(
                 value = password,
                 onValueChange = { viewModel.updatePassword(it) },
@@ -140,7 +133,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Чекбокс согласия
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -165,7 +157,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Кнопка регистрации и статусы
             when (val state = resultState) {
                 is ResultState.Loading -> {
                     CircularProgressIndicator(color = accentColor)
@@ -215,7 +206,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Ссылка на вход
             TextButton(
                 onClick = { navController.navigate("signIn") },
                 modifier = Modifier.padding(0.dp)

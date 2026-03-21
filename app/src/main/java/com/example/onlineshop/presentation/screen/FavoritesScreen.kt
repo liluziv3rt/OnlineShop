@@ -143,7 +143,6 @@ fun FavoriteItem(
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            // Картинка товара
             Box(
                 modifier = Modifier
                     .size(100.dp)
@@ -160,7 +159,6 @@ fun FavoriteItem(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Информация о товаре
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -194,13 +192,11 @@ fun FavoriteItem(
                 )
             }
 
-            // Кнопки действий
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.height(100.dp)
             ) {
-                // Кнопка удалить из избранного
                 IconButton(
                     onClick = onFav,
                     modifier = Modifier.size(32.dp)
@@ -212,7 +208,6 @@ fun FavoriteItem(
                     )
                 }
 
-                // Кнопка корзины
                 IconButton(
                     onClick = onCart,
                     modifier = Modifier

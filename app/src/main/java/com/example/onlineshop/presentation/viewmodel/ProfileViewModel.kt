@@ -25,7 +25,6 @@ class ProfileViewModel @Inject constructor(
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
-        // Сначала пробуем взять из сессии
         session.currentLogin?.user?.let { user ->
             _userProfile.value = UserProfile(
                 id = user.id,
@@ -36,7 +35,6 @@ class ProfileViewModel @Inject constructor(
                 phone = user.phone ?: "Не указан"
             )
         } ?: run {
-            // Если в сессии нет, загружаем из БД
             loadUserProfile()
         }
     }
@@ -45,7 +43,6 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Сначала пробуем взять из сессии
                 session.currentLogin?.user?.let { user ->
                     _userProfile.value = UserProfile(
                         id = user.id,
@@ -56,7 +53,6 @@ class ProfileViewModel @Inject constructor(
                         phone = user.phone ?: "Не указан"
                     )
                 } ?: run {
-                    // Если в сессии нет, загружаем из БД
                     val profile = repository.getUserProfile(session.userId)
                     _userProfile.value = profile
                 }

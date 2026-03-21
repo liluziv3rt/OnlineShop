@@ -44,7 +44,7 @@ class HomeViewModel @Inject constructor(
     var selectedCategoryId by mutableStateOf<String?>(null)
         private set
 
-    var errorMessage by mutableStateOf<String?>(null) // для отображения ошибки
+    var errorMessage by mutableStateOf<String?>(null)
         private set
 
     init {
@@ -79,7 +79,6 @@ class HomeViewModel @Inject constructor(
                 errorMessage = null
             } catch (e: Exception) {
                 errorMessage = "Ошибка загрузки товаров: ${e.message}"
-                // Логируем ошибку
             }
         }
     }
@@ -115,7 +114,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 repo.toggleFavourite(id)
-                load() // перезагружаем товары, чтобы обновить состояние избранного
+                load()
             } catch (e: Exception) {
                 errorMessage = "Ошибка при изменении избранного: ${e.message}"
             }

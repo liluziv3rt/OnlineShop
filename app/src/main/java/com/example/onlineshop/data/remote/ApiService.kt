@@ -42,7 +42,6 @@ interface ApiService {
     @GET("auth/v1/user")
     suspend fun getUserAsync(@Header("Authorization") authorization: String): UserDto
 
-    // ---------- Товары, категории, акции (публичные) ----------
     @GET("rest/v1/products")
     suspend fun getProducts(): List<ProductDto>
 
@@ -55,7 +54,6 @@ interface ApiService {
     @GET("rest/v1/actions")
     suspend fun getActions(): List<ActionDto>
 
-    // ---------- Избранное (требуется авторизация) ----------
     @GET("rest/v1/favourite")
     suspend fun getFavourites(@Query("user_id") userId: String): List<FavouriteDto>
 
@@ -69,7 +67,6 @@ interface ApiService {
     ) : Response<Unit>
 
 
-    // ---------- Корзина (требуется авторизация) ----------
     @GET("rest/v1/cart")
     suspend fun getCart(@Query("user_id") userId: String): List<CartDto>
 

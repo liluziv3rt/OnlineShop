@@ -68,18 +68,16 @@ fun HomeScreen(
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    IconButton(onClick = { /* перейти в корзину */ }) {
+                    IconButton(onClick = {  }) {
                         Icon(Icons.Default.ShoppingCart, contentDescription = "Корзина")
                     }
                 }
             }
 
-            // Поиск с иконкой фильтра
             item {
                 SearchBarWithFilter()
             }
 
-            // Категории
             item {
                 CategoryRow(
                     categories = categories,
@@ -88,7 +86,6 @@ fun HomeScreen(
                 )
             }
 
-            // Заголовок "Популярное" с кнопкой Все/Свернуть
             item {
                 SectionHeader(
                     title = "Популярное",
@@ -97,7 +94,6 @@ fun HomeScreen(
                 )
             }
 
-            // Товары (первые два или все)
             val displayedProducts = if (showAllProducts) products else products.take(2)
             items(displayedProducts.chunked(2)) { chunk ->
                 Row(
@@ -121,7 +117,6 @@ fun HomeScreen(
                 }
             }
 
-            // Акции
             if (actions.isNotEmpty()) {
                 item {
                     Text(
@@ -136,7 +131,6 @@ fun HomeScreen(
                 }
             }
 
-            // Ошибка (если есть)
             if (errorMessage != null) {
                 item {
                     Text(
@@ -147,7 +141,6 @@ fun HomeScreen(
                 }
             }
 
-            // Небольшой отступ снизу
             item {
                 Spacer(modifier = Modifier.height(16.dp))
             }

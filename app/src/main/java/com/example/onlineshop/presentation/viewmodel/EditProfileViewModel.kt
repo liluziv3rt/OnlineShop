@@ -78,10 +78,8 @@ class EditProfileViewModel @Inject constructor(
                         photoUrl = _photoUri.value ?: currentProfile.photoUrl
                     )
 
-                    // Сохраняем в БД
                     repository.updateUserProfile(updatedProfile)
 
-                    // Обновляем сессию
                     session.currentLogin?.let { loginResponse ->
                         val updatedUser = User(
                             id = loginResponse.user.id,

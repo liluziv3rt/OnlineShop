@@ -46,7 +46,6 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 repository.toggleFavourite(productId)
-                // Обновляем список после изменения
                 loadFavorites()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -58,7 +57,6 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 repository.toggleCart(productId)
-                // Обновляем статус корзины в текущем списке
                 _favorites.value = _favorites.value.map {
                     if (it.id == productId) {
                         it.copy(inCart = !it.inCart)

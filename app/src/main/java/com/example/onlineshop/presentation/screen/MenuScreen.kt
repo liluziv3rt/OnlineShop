@@ -32,8 +32,7 @@ fun MenuScreen(
     val user by viewModel.userProfile.collectAsState()
     val currentUser = user
 
-    // Светло-голубой фон
-    val backgroundColor = Color(0xFFE6F3FF) // Чуть светлее, как на макете
+    val backgroundColor = Color(0xFFE6F3FF)
 
     Box(
         modifier = Modifier
@@ -44,12 +43,10 @@ fun MenuScreen(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Верхний отступ
             item {
                 Spacer(modifier = Modifier.height(48.dp))
             }
 
-            // Большая аватарка
             item {
                 if (currentUser?.photo != null) {
                     AsyncImage(
@@ -72,7 +69,6 @@ fun MenuScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Имя и фамилия
             item {
                 Text(
                     text = listOfNotNull(currentUser?.firstName, currentUser?.lastName)
@@ -86,7 +82,6 @@ fun MenuScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
-            // Пункты меню
             val menuItems = listOf(
                 MenuItem("Профиль", Icons.Default.Person),
                 MenuItem("Корзина", Icons.Default.ShoppingCart),
@@ -135,12 +130,10 @@ fun MenuScreen(
                 )
             }
 
-            // Дополнительный отступ перед кнопкой выхода
             item {
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Кнопка выхода
             item {
                 ListItem(
                     headlineContent = {

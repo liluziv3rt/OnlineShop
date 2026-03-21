@@ -57,7 +57,6 @@ fun ProfileScreen(
                     .background(Color.White)
                     .padding(paddingValues)
             ) {
-                // Верхняя панель с кнопками
                 item {
                     Row(
                         modifier = Modifier
@@ -91,7 +90,6 @@ fun ProfileScreen(
                     }
                 }
 
-                // Аватар
                 item {
                     Box(
                         modifier = Modifier
@@ -119,7 +117,6 @@ fun ProfileScreen(
                     }
                 }
 
-                // Имя и фамилия
                 item {
                     Text(
                         text = listOfNotNull(userProfile?.firstName, userProfile?.lastName)
@@ -157,7 +154,6 @@ fun ProfileScreen(
                                 generateBarcodePattern(userProfile?.id ?: "123456789")
                             }
 
-                            // Штрих-код
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -175,7 +171,6 @@ fun ProfileScreen(
                                 }
                             }
 
-                            // Цифры под штрих-кодом
                             Text(
                                 text = userProfile?.id?.takeLast(8)?.chunked(4)?.joinToString(" ") ?: "0000 0000",
                                 fontSize = 16.sp,
@@ -187,7 +182,6 @@ fun ProfileScreen(
                     }
                 }
 
-                // Поля профиля
                 item {
                     ProfileField(
                         label = "Имя",
@@ -216,7 +210,6 @@ fun ProfileScreen(
                     )
                 }
 
-                // Нижний отступ
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -256,16 +249,12 @@ fun ProfileField(
     }
 }
 
-// Функция для генерации паттерна штрих-кода из ID
-// Замените функцию generateBarcodePattern на эту:
 
 private fun generateBarcodePattern(id: String): List<Int> {
     val pattern = mutableListOf<Int>()
-    // Берем хеш от ID для генерации
     val hash = id.hashCode().absoluteValue
     val hashString = hash.toString() + id.takeLast(4)
 
-    // Каждая цифра дает разную комбинацию полосок
     for (char in hashString) {
         val digit = char.digitToIntOrNull() ?: 0
         when (digit) {

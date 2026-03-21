@@ -82,7 +82,7 @@ class AuthRepositoryImpl @Inject constructor(
             profiles.firstOrNull()?.let { profile ->
                 User(
                     id = profile.id,
-                    email = "", // email не хранится в profiles
+                    email = "",
                     firstName = profile.firstname,
                     lastName = profile.lastname,
                     photo = profile.photo,

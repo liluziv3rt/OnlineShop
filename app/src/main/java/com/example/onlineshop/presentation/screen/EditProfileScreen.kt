@@ -159,7 +159,6 @@ fun EditProfileScreen(
                                 )
                             }
 
-                            // Иконка камеры для изменения фото
                             Icon(
                                 imageVector = Icons.Default.AccountCircle,
                                 contentDescription = "Изменить фото",
@@ -278,7 +277,6 @@ fun EditProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Кнопка очистки
                         OutlinedButton(
                             onClick = {
                                 firstName = ""

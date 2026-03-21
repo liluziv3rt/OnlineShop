@@ -58,7 +58,6 @@ class SignUpViewModel @Inject constructor(
             _fullName.value.isBlank() -> "Введите имя и фамилию"
             !_consentGiven.value -> "Необходимо дать согласие на обработку данных"
             else -> {
-                // Проверяем формат имени
                 try {
                     NameParser.parseFullName(_fullName.value)
                     null
